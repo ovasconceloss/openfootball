@@ -1,4 +1,7 @@
 use serde::{Deserialize, Serialize};
+use crate::core::domain::value_objects::physical_attributes::PhysicalAttributes;
+
+pub struct MappingError();
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PhysicalDatabase {
@@ -8,4 +11,32 @@ pub struct PhysicalDatabase {
   pub jumping: i64,
   pub strength: i64,
   pub acceleration: i64,
+}
+
+impl From<PhysicalAttributes> for PhysicalDatabase {
+  fn from(physical_attributees: PhysicalAttributes) -> Self {
+    PhysicalDatabase { 
+      pace: i64::from(physical_attributees.pace), 
+      stamina: i64::from(physical_attributees.stamina), 
+      agility: i64::from(physical_attributees.agility), 
+      jumping: i64::from(physical_attributees.jumping), 
+      strength: i64::from(physical_attributees.strength), 
+      acceleration: i64::from(physical_attributees.acceleration) 
+    }
+  }
+}
+
+impl TryFrom<PhysicalDatabase> for PhysicalAttributes {
+  type Error = MappingError;
+
+  fn try_from(physical_database: PhysicalDatabase) -> Result<Self, Self::Error> {
+    Ok(PhysicalAttributes::new(
+      physical_database.pace.try_into().unwrap(), 
+      physical_database.stamina.try_into().unwrap(), 
+      physical_database.agility.try_into().unwrap(), 
+      physical_database.jumping.try_into().unwrap(), 
+      physical_database.strength.try_into().unwrap(),
+      physical_database.acceleration.try_into().unwrap()
+    ))
+  }
 }
