@@ -1,4 +1,6 @@
-#[derive(Clone, Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PhysicalAttributes {
   pub pace: i32,
   pub stamina: i32,

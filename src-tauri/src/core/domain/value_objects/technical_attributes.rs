@@ -1,4 +1,6 @@
-#[derive(Clone, Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TechnicalAttributes {
   pub vision: i32,
   pub passing: i32,
