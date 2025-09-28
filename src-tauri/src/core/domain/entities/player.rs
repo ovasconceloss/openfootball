@@ -26,7 +26,7 @@ pub struct Player {
 impl Player {
   pub fn new(
     id: i64, nation_id: i64, last_name: impl Into<String>, first_name: impl Into<String>, 
-    birth_date: NaiveDate, main_position: Position, 
+    birth_date: NaiveDate, main_position: Position, secondary_positions: Vec<Position>, 
     mentals: MentalAttributes, physicals: PhysicalAttributes, technicals: TechnicalAttributes
   ) -> Self {
     Self { 
@@ -36,7 +36,7 @@ impl Player {
       first_name: first_name.into(),
       birth_date,
       main_position,
-      secondary_positions: Vec::new(),
+      secondary_positions: secondary_positions,
       mental_attributes: mentals,
       physical_attributes: physicals,
       technical_attributes: technicals
