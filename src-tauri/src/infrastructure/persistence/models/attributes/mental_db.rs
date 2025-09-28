@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use crate::core::domain::value_objects::mental_attributes::MentalAttributes;
-
-pub struct MappingError();
+use crate::{
+  core::domain::value_objects::mental_attributes::MentalAttributes, 
+  infrastructure::persistence::models::errors::mapping_error::MappingError,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MentalDatabase {

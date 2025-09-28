@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use crate::core::domain::value_objects::technical_attributes::TechnicalAttributes;
-
-pub struct MappingError();
+use crate::{
+  core::domain::value_objects::technical_attributes::TechnicalAttributes, 
+  infrastructure::persistence::models::errors::mapping_error::MappingError, 
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TechnicalDatabase {

@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use crate::core::domain::value_objects::physical_attributes::PhysicalAttributes;
-
-pub struct MappingError();
+use crate::{
+  core::domain::value_objects::physical_attributes::PhysicalAttributes, 
+  infrastructure::persistence::models::errors::mapping_error::MappingError, 
+};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PhysicalDatabase {
