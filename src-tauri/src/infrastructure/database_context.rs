@@ -1,5 +1,4 @@
 use std::path::Path;
-
 use rusqlite::Connection;
 use crate::{
   core::domain::enums::errors::repository_error::RepositoryError, 
@@ -8,6 +7,8 @@ use crate::{
     repositories::sqlite_player_repository::SqlitePlayerRepository
   }
 };
+
+const IN_MEMORY_DB_PATH: &str = "./tests/openfootballv1.tests.db"; 
 
 pub struct SqlitePersistenceContext {
   pub player_repository: SqlitePlayerRepository
@@ -26,5 +27,9 @@ impl SqlitePersistenceContext {
     Ok(SqlitePersistenceContext { 
       player_repository: player_repository 
     })
+  }
+
+  pub fn initialize_for_test() -> Result<Self, RepositoryError> {
+    Self::initialize(IN_MEMORY_DB_PATH)
   }
 }
