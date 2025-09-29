@@ -1,6 +1,7 @@
-use std::str::FromStr;
 use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use rusqlite::{types::Type, Row};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use crate::{
   core::domain::{
     entities::player::Player, 
@@ -10,11 +11,13 @@ use crate::{
       technical_attributes::TechnicalAttributes
     }
   }, 
-  infrastructure::persistence::models::{attributes::{
-    mental_db::MentalDatabase, 
-    physical_db::PhysicalDatabase, 
-    technical_db::TechnicalDatabase
-  }, errors::mapping_error::MappingError}
+  infrastructure::persistence::models::{
+    attributes::{
+      mental_db::MentalDatabase, 
+      physical_db::PhysicalDatabase, 
+      technical_db::TechnicalDatabase
+    }, 
+  errors::mapping_error::MappingError}
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,6 +32,36 @@ pub struct PlayerDatabase {
   pub mental_attributes: MentalDatabase,
   pub physical_attributes: PhysicalDatabase,
   pub technical_attributes: TechnicalDatabase
+}
+
+fn get_json_column<T: DeserializeOwned>(row: &Row, column_name: &str, column_idx: usize) -> Result<T, rusqlite::Error> {
+  let json_string: String = row.get(column_name)?;
+  
+  serde_json::from_str(&json_string).map_err(|error| {
+    rusqlite::Error::FromSqlConversionFailure(column_idx, Type::Text, Box::new(error))
+  })
+}
+
+impl PlayerDatabase {
+  pub fn from_row(row: &Row, mental_idx: usize, physical_idx: usize, technical_idx: usize) -> Result<Self, rusqlite::Error> {
+
+    let mental_database: MentalDatabase = get_json_column(row, "mental_attributes_json", mental_idx)?;
+    let physical_database: PhysicalDatabase = get_json_column(row, "physical_attributes_json", physical_idx)?;
+    let technical_database: TechnicalDatabase = get_json_column(row, "technical_attributes_json", technical_idx)?;
+
+    Ok(PlayerDatabase { 
+      id: row.get(0)?, 
+      nation_id: row.get(1)?, 
+      last_name: row.get(2)?, 
+      first_name: row.get(3)?, 
+      birth_date: row.get(4)?, 
+      main_position: row.get(5)?, 
+      secondary_positions: row.get(6)?, 
+      mental_attributes: mental_database, 
+      physical_attributes: physical_database, 
+      technical_attributes: technical_database 
+    })
+  }
 }
 
 impl From<Player> for PlayerDatabase {
