@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use rusqlite::{types::ToSqlOutput, ToSql};
 use crate::{
   core::domain::value_objects::physical_attributes::PhysicalAttributes, 
   infrastructure::persistence::models::errors::mapping_error::MappingError, 
@@ -12,6 +13,15 @@ pub struct PhysicalDatabase {
   pub jumping: i64,
   pub strength: i64,
   pub acceleration: i64,
+}
+
+impl ToSql for PhysicalDatabase {
+  fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+    let json_string = serde_json::to_string(self)
+      .map_err(|error| rusqlite::Error::ToSqlConversionFailure(Box::new(error)))?;
+
+    Ok(ToSqlOutput::Owned(rusqlite::types::Value::Text(json_string)))
+  }
 }
 
 impl From<PhysicalAttributes> for PhysicalDatabase {

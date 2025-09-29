@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use rusqlite::{types::ToSqlOutput, ToSql};
 use crate::{
   core::domain::value_objects::technical_attributes::TechnicalAttributes, 
   infrastructure::persistence::models::errors::mapping_error::MappingError, 
@@ -13,6 +14,15 @@ pub struct TechnicalDatabase {
   pub tackling: i64,
   pub dribbling: i64,
   pub finishing: i64,
+}
+
+impl ToSql for TechnicalDatabase {
+  fn to_sql(&self) -> rusqlite::Result<ToSqlOutput<'_>> {
+    let json_string = serde_json::to_string(self)
+      .map_err(|error| rusqlite::Error::ToSqlConversionFailure(Box::new(error)))?;
+
+    Ok(ToSqlOutput::Owned(rusqlite::types::Value::Text(json_string)))
+  }
 }
 
 impl From<TechnicalAttributes> for TechnicalDatabase {
