@@ -6,8 +6,7 @@ use crate::{
     repositories::player_repository::PlayerRepository
   }, 
   infrastructure::persistence::models::{ 
-    player_db::PlayerDatabase,
-    errors::mapping_error::MappingError, 
+    errors::mapping_error::MappingError, player_db::PlayerDatabase 
   }
 };
 
@@ -43,7 +42,10 @@ impl PlayerRepository for SqlitePlayerRepository {
         player_database.first_name,
         player_database.birth_date,
         player_database.main_position,
-        player_database.secondary_positions
+        player_database.secondary_positions,
+        player_database.mental_attributes,
+        player_database.physical_attributes,
+        player_database.technical_attributes
       )
     );
 
@@ -64,13 +66,13 @@ impl PlayerRepository for SqlitePlayerRepository {
     let mut statement = self.connection.prepare(SQL_GET_ALL)
       .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let mental_idx = statement.column_index("mental_attributes_json")
+    let mental_idx = statement.column_index("mental_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let physical_idx = statement.column_index("physical_attributes_json")
+    let physical_idx = statement.column_index("physical_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let technical_idx = statement.column_index("technical_attributes_json")
+    let technical_idx = statement.column_index("technical_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
     let rows = statement.query_map([], |row| PlayerDatabase::from_row(row, mental_idx, physical_idx, technical_idx))
@@ -94,14 +96,14 @@ impl PlayerRepository for SqlitePlayerRepository {
     let mut statement = self.connection.prepare(SQL_GET_BY_ID)
       .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let mental_idx = statement.column_index("mental_attributes_json")
-    .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
+    let mental_idx = statement.column_index("mental_attributes")
+      .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let physical_idx = statement.column_index("physical_attributes_json")
-    .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
+    let physical_idx = statement.column_index("physical_attributes")
+      .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let technical_idx = statement.column_index("technical_attributes_json")
-    .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
+    let technical_idx = statement.column_index("technical_attributes")
+      .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
     let player_database = statement
       .query_row([id], |row| PlayerDatabase::from_row(row, mental_idx, physical_idx, technical_idx))
@@ -112,7 +114,10 @@ impl PlayerRepository for SqlitePlayerRepository {
 
     let player: Player = player_database
       .try_into()
-      .map_err(|error: MappingError| RepositoryError::DatabaseError(error.0))?;
+      .map_err(|error: MappingError| {
+        eprintln!("{:?}", error);
+        RepositoryError::DatabaseError(error.0)
+      })?;
 
     Ok(player)
   }
@@ -121,13 +126,13 @@ impl PlayerRepository for SqlitePlayerRepository {
     let mut statement = self.connection.prepare(SQL_GET_BY_CLUB)
       .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let mental_idx = statement.column_index("mental_attributes_json")
+    let mental_idx = statement.column_index("mental_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let physical_idx = statement.column_index("physical_attributes_json")
+    let physical_idx = statement.column_index("physical_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
-    let technical_idx = statement.column_index("technical_attributes_json")
+    let technical_idx = statement.column_index("technical_attributes")
     .map_err(|error| RepositoryError::DatabaseError(error.to_string()))?;
 
     let rows = statement.query_map([id], |row| PlayerDatabase::from_row(row, mental_idx, physical_idx, technical_idx))
