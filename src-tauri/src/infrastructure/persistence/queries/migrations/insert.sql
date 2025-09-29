@@ -1,0 +1,1 @@
+INSERT INTO schema_migrations (filename, applied_at) VALUES (?1, datetime('now'))
