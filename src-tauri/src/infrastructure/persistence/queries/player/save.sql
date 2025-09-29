@@ -5,5 +5,8 @@ INSERT OR REPLACE INTO players (
   first_name, 
   birth_date, 
   main_position, 
-  secondary_positions
-) VALUES (?, ?, ?, ?, ?, ?, ?)
+  secondary_positions,
+  mental_attributes,
+  physical_attributes,
+  technical_attributes
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
