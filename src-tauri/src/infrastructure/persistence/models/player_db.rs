@@ -45,9 +45,9 @@ fn get_json_column<T: DeserializeOwned>(row: &Row, column_name: &str, column_idx
 impl PlayerDatabase {
   pub fn from_row(row: &Row, mental_idx: usize, physical_idx: usize, technical_idx: usize) -> Result<Self, rusqlite::Error> {
 
-    let mental_database: MentalDatabase = get_json_column(row, "mental_attributes_json", mental_idx)?;
-    let physical_database: PhysicalDatabase = get_json_column(row, "physical_attributes_json", physical_idx)?;
-    let technical_database: TechnicalDatabase = get_json_column(row, "technical_attributes_json", technical_idx)?;
+    let mental_database: MentalDatabase = get_json_column(row, "mental_attributes", mental_idx)?;
+    let physical_database: PhysicalDatabase = get_json_column(row, "physical_attributes", physical_idx)?;
+    let technical_database: TechnicalDatabase = get_json_column(row, "technical_attributes", technical_idx)?;
 
     Ok(PlayerDatabase { 
       id: row.get(0)?, 
@@ -97,7 +97,7 @@ impl TryFrom<PlayerDatabase> for Player {
     let birth_date = NaiveDate::parse_from_str(&player_database.birth_date, "%d-%m-%Y")
       .map_err(|error| MappingError(format!("Invalid birth date format: {}", error)))?;
 
-    let main_position = Position::from_str(&player_database.main_position)
+    let main_position = Position::from_str(&player_database.main_position.to_lowercase().replace("\"", ""))
       .map_err(|error| MappingError(format!("Invalid main position: {:?}", error)))?;
 
     let secondary_positions: Vec<Position> = serde_json::from_str(&player_database.secondary_positions)
